@@ -1,2 +1,2 @@
 # git_test
-Git denemesi
+Git denemesi v.1.0
