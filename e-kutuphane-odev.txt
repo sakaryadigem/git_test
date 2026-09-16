@@ -1,0 +1,30 @@
+1. VIEW (Sanal Tablolar)
+Amaç: Karmaşık JOIN sorgularını basitleştirmek ve güvenli veri sunumları oluşturmak.
+
+Basit: vw_kitap_detaylari adında bir view oluşturun. Bu view; kitabın adını, yazarın adını ve kategori adını tek bir tabloda göstermelidir.
+Orta: vw_odunc_listesi adında bir view oluşturun. Bu view; şu an kitabı elinde olan kullanıcıların isimlerini, aldıkları kitabın adını ve son teslim tarihini listelemelidir. (Sadece teslim_tarihi boş olanlar).
+Zor: vw_populer_kitaplar adında bir view oluşturun. Bu view; en çok ödünç alınma sayısına göre kitapları sıralasın ve her kitabın toplam kaç kez ödünç alındığını ve şu an kaç kopyasının müsait olduğunu göstersin.
+2. FUNCTION (Fonksiyonlar)
+Amaç: Tekrarlanan hesaplamaları tek bir merkezden yönetmek.
+
+Basit: fn_gecikme_gunu(islem_id INT) isimli bir fonksiyon yazın. Bu fonksiyon, kitabın son teslim tarihi ile bugünün tarihi arasındaki farkı (gün olarak) döndürsün. (Eğer kitap teslim edildiyse 0 döndürmeli).
+Orta: fn_ceza_hesapla(islem_id INT) isimli bir fonksiyon yazın. Gecikilen her gün için 5 TL ceza hesaplasın. Eğer kitap zamanında teslim edildiyse 0 döndürsün.
+Zor: fn_kullanici_durumu(kullanici_id INT) isimli bir fonksiyon yazın. Kullanıcının üzerinde teslim tarihi geçmiş kitap varsa 'Borçlu', yoksa ama şu an ödünçte kitabı varsa 'Aktif', hiçbir kitabı yoksa 'Pasif' değerini döndürsün.
+3. STORED PROCEDURE (Saklı Yordamlar)
+Amaç: Birden fazla SQL işlemini bir paket haline getirip parametrelerle çalıştırmak.
+
+Basit: sp_kitap_ekle adında bir procedure yazın. Parametre olarak kitap adı, yazar id, kategori id ve türü alsın ve kitabı eklesin.
+Orta: sp_kitap_odunc_ver adında bir procedure yazın. Parametre olarak kullanici_id ve kopya_id alsın. İşlem şunları yapmalı:
+Kitap kopyasının durumu 'musait' mi kontrol etsin.
+Müsaitse odunc_islemleri tablosuna kayıt atsın.
+kitap_kopyalari tablosundaki durumunu 'odunc_verildi' olarak güncellesin.
+Zor: sp_kitap_iade_et adında bir procedure yazın. Parametre olarak islem_id alsın. İşlem şunları yapmalı:
+odunc_islemleri tablosunda teslim tarihini bugünün tarihiyle güncellesin.
+Kitap kopyasının durumunu tekrar 'musait' yapsın.
+Eğer kitap gecikmeli teslim edildiyse, ekrana "Kullanıcıya [X] TL ceza uygulandı" mesajını bastırsın (veya bir ceza tablosuna kayıt atsın).
+4. TRIGGER (Tetikleyiciler)
+Amaç: Veritabanı seviyesinde otomatik kurallar ve denetimler oluşturmak.
+
+Basit: tr_okuma_güncelleme adında bir trigger yazın. okuma_ilerlemesi tablosuna yeni bir kayıt eklendiğinde veya güncellendiğinde, bu işlemin tarihini son_okuma_tarihi alanına otomatik olarak yazsın.
+Orta: tr_odunc_limit_kontrol adında bir trigger yazın. Bir kullanıcı kitap ödünç alırken (odunc_islemleri tablosuna INSERT yapılırken), kullanıcının üzerinde şu an aktif olarak 3'ten fazla kitap varsa işlemi engellesin ve hata mesajı versin (SIGNAL SQLSTATE).
+Zor: tr_kopya_durum_senkronize adında bir trigger yazın. odunc_islemleri tablosunda bir kayıt silindiğinde veya teslim tarihi güncellendiğinde, ilgili kitap_kopyalari tablosundaki kitabın durumunu otomatik olarak 'musait' hale getirsin.
